@@ -1,0 +1,34 @@
+name: Run Colab Notebook Automatically
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # Chạy mỗi ngày vào lúc 9 AM (UTC)
+  workflow_dispatch:  # Cho phép chạy thủ công nếu cần
+
+jobs:
+  run-notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install Dependencies
+        run: |
+          pip install gdown google-colab
+
+      - name: Download Colab Notebook
+        run: |
+          gdown https://drive.google.com/uc?id=<1OcbkxUNTB3XKjBqnZ_ixaRBl1aljzMR5> -O notebook_to_run.ipynb
+
+      - name: Execute Notebook
+        run: |
+          python -c "
+          from google.colab import drive
+          drive.mount('/content/drive')
+          !jupyter nbconvert --execute --inplace --to notebook notebook_to_run.ipynb
+          "
